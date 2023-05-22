@@ -1,6 +1,6 @@
 {
   "name": "@jrnv/git-glob-scanner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Scan files inside directory respecting `.gitignore` and submodules",
   "main": "index.js",
   "repository": "git@github.com:zharinov/git-glob-scanner.git",

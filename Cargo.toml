@@ -2,7 +2,7 @@
 authors = ["Sergei Zharinov <s@jrnv.me>"]
 edition = "2021"
 name    = "dir-glob-scan"
-version = "1.0.0"
+version = "1.0.1"
 
 [lib]
 crate-type = ["cdylib"]
