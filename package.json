@@ -1,7 +1,7 @@
 {
   "name": "git-glob-scanner",
   "version": "1.0.0",
-  "description": "Scan files using glob patterns in git repositories",
+  "description": "Scan files inside directory respecting `.gitignore` and submodules",
   "main": "index.js",
   "repository": "git@github.com:zharinov/git-glob-scanner.git",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "index.js"
   ],
   "napi": {
-    "name": "package-template",
+    "name": "git-glob-scanner",
     "triples": {
       "defaults": true,
       "additional": [

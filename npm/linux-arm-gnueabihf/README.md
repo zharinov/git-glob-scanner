@@ -1,3 +1,3 @@
-# `@napi-rs/package-template-linux-arm-gnueabihf`
+# `@jrnv/git-glob-scanner-linux-arm-gnueabihf`
 
-This is the **armv7-unknown-linux-gnueabihf** binary for `@napi-rs/package-template`
+This is the **armv7-unknown-linux-gnueabihf** binary for `@jrnv/git-glob-scanner`
