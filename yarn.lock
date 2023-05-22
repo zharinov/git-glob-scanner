@@ -132,31 +132,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/package-template@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@napi-rs/package-template@workspace:."
-  dependencies:
-    "@napi-rs/cli": ^2.15.2
-    "@swc-node/register": ^1.5.5
-    "@swc/core": ^1.3.32
-    "@taplo/cli": ^0.5.2
-    "@typescript-eslint/eslint-plugin": ^5.50.0
-    "@typescript-eslint/parser": ^5.50.0
-    ava: ^5.1.1
-    benny: ^3.7.1
-    chalk: ^5.2.0
-    eslint: ^8.33.0
-    eslint-config-prettier: ^8.6.0
-    eslint-plugin-import: ^2.27.5
-    eslint-plugin-prettier: ^4.2.1
-    husky: ^8.0.3
-    lint-staged: ^13.1.0
-    npm-run-all: ^4.1.5
-    prettier: ^2.8.3
-    typescript: ^5.0.0
-  languageName: unknown
-  linkType: soft
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -2018,6 +1993,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"git-glob-scanner@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "git-glob-scanner@workspace:."
+  dependencies:
+    "@napi-rs/cli": ^2.15.2
+    "@swc-node/register": ^1.5.5
+    "@swc/core": ^1.3.32
+    "@taplo/cli": ^0.5.2
+    "@typescript-eslint/eslint-plugin": ^5.50.0
+    "@typescript-eslint/parser": ^5.50.0
+    ava: ^5.1.1
+    benny: ^3.7.1
+    chalk: ^5.2.0
+    eslint: ^8.33.0
+    eslint-config-prettier: ^8.6.0
+    eslint-plugin-import: ^2.27.5
+    eslint-plugin-prettier: ^4.2.1
+    husky: ^8.0.3
+    lint-staged: ^13.1.0
+    npm-run-all: ^4.1.5
+    prettier: ^2.8.8
+    prettier-plugin-rust: ^0.1.8
+    typescript: ^5.0.0
+  languageName: unknown
+  linkType: soft
+
 "glob-parent@npm:^5.1.2, glob-parent@npm:~5.1.2":
   version: 5.1.2
   resolution: "glob-parent@npm:5.1.2"
@@ -2613,6 +2614,13 @@ __metadata:
   version: 2.0.0
   resolution: "isexe@npm:2.0.0"
   checksum: 26bf6c5480dda5161c820c5b5c751ae1e766c587b1f951ea3fcfc973bafb7831ae5b54a31a69bd670220e42e99ec154475025a468eae58ea262f813fdc8d1c62
+  languageName: node
+  linkType: hard
+
+"jinx-rust@npm:0.1.6":
+  version: 0.1.6
+  resolution: "jinx-rust@npm:0.1.6"
+  checksum: f5b25886a5cc6be3bda7b56ef89b4a605684153d0a3700df3e6d7439a456d961d1f6b095fd4092c4b80b3f5d1dced2a44d90f7346884f7b7f37935322f31f33d
   languageName: node
   linkType: hard
 
@@ -3557,7 +3565,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.8.3":
+"prettier-plugin-rust@npm:^0.1.8":
+  version: 0.1.8
+  resolution: "prettier-plugin-rust@npm:0.1.8"
+  dependencies:
+    jinx-rust: 0.1.6
+    prettier: ^2.7.1
+  checksum: e4e68a9749c10c52a591cab1b0c02c87fb1e44be601bddff0ce2b8872f8b62b7c8d73b71297f0e59ec9880816e4d0dab4b3769b62c524d7738e4ea5b788a8e2f
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^2.7.1, prettier@npm:^2.8.8":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
   bin:

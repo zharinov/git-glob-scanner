@@ -8,9 +8,9 @@ version = "0.1.0"
 crate-type = ["cdylib"]
 
 [dependencies]
-gix-config = "0.22.0"
-globset = "0.4.10"
-ignore = "0.4.20"
+gix-config  = "0.22.0"
+globset     = "0.4.10"
+ignore      = "0.4.20"
 napi        = "2"
 napi-derive = "2"
 
