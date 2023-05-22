@@ -1,5 +1,5 @@
 {
-  "name": "git-glob-scanner",
+  "name": "@jrnv/git-glob-scanner",
   "version": "1.0.0",
   "description": "Scan files inside directory respecting `.gitignore` and submodules",
   "main": "index.js",
