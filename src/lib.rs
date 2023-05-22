@@ -2,8 +2,8 @@
 
 use napi_derive::napi;
 
-use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 use std::path::Path;
 use std::str::FromStr;
 
@@ -13,12 +13,10 @@ fn read_submodule_paths(gitmodules: &str) -> Result<Option<Vec<String>>, gix_con
   let file = gix_config::File::from_str(gitmodules)?;
   if let Some(sections) = file.sections_by_name("submodule") {
     let paths = sections
-      .filter_map(|section| {
-        match section.value("path") {
-          Some(path) => Some(path.to_string()),
-          None => {
-            return None;
-          }
+      .filter_map(|section| match section.value("path") {
+        Some(path) => Some(path.to_string()),
+        None => {
+          return None;
         }
       })
       .collect::<Vec<String>>();
@@ -29,8 +27,7 @@ fn read_submodule_paths(gitmodules: &str) -> Result<Option<Vec<String>>, gix_con
 
 #[test]
 fn test_read_submodule_paths() {
-  let gitmodules =
-    r#"
+  let gitmodules = r#"
     [submodule "foo/bar/baz"]
             path = foo/bar/baz
             url = https://github.com/zharinov/good-enough-parser
@@ -48,7 +45,10 @@ fn get_submodule_paths(repo_path: &Path) -> Option<Vec<String>> {
     .unwrap_or(None)
 }
 
-fn walk_repo<'a, F, Res>(repo_dir: &str, f: F) -> Vec<Res> where F: Fn(&Path) -> Option<Res> {
+fn walk_repo<'a, F, Res>(repo_dir: &str, f: F) -> Vec<Res>
+where
+  F: Fn(&Path) -> Option<Res>,
+{
   let repo_path = Path::new(repo_dir);
 
   let submodule_paths = get_submodule_paths(repo_path);
@@ -211,7 +211,10 @@ pub fn walk_repo_globs(repo_dir: String, globs: Vec<String>) -> Vec<String> {
 #[test]
 fn test_walk_repo_globs() {
   let repo = "../renovate".to_string();
-  let globs = vec!["**/package.json".to_string(), "**/package-lock.json".to_string()];
+  let globs = vec![
+    "**/package.json".to_string(),
+    "**/package-lock.json".to_string(),
+  ];
   let paths = walk_repo_globs(repo, globs);
   for path in paths {
     println!("{}", path);
@@ -219,7 +222,10 @@ fn test_walk_repo_globs() {
 }
 
 #[napi]
-pub fn walk_repo_globs_map(repo_dir: String, globs_map: HashMap<String, Vec<String>>) -> HashMap<String, Vec<String>> {
+pub fn walk_repo_globs_map(
+  repo_dir: String,
+  globs_map: HashMap<String, Vec<String>>,
+) -> HashMap<String, Vec<String>> {
   let mut accum: HashMap<&String, Vec<String>> = HashMap::new();
   let matchers: Vec<(&String, globset::GlobSet)> = globs_map
     .iter()
@@ -274,8 +280,20 @@ pub fn walk_repo_globs_map(repo_dir: String, globs_map: HashMap<String, Vec<Stri
 fn test_walk_repo_globs_map() {
   let repo = "../renovate".to_string();
   let mut globs_map = HashMap::new();
-  globs_map.insert("package".to_string(), vec!["**/package.json".to_string(), "**/package-lock.json".to_string()]);
-  globs_map.insert("lock".to_string(), vec!["**/yarn.lock".to_string(), "**/package-lock.json".to_string()]);
+  globs_map.insert(
+    "package".to_string(),
+    vec![
+      "**/package.json".to_string(),
+      "**/package-lock.json".to_string(),
+    ],
+  );
+  globs_map.insert(
+    "lock".to_string(),
+    vec![
+      "**/yarn.lock".to_string(),
+      "**/package-lock.json".to_string(),
+    ],
+  );
   let paths_map = walk_repo_globs_map(repo, globs_map);
   for (key, paths) in paths_map {
     for path in paths {
