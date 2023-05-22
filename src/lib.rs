@@ -9,20 +9,21 @@ use std::str::FromStr;
 
 use globset::Glob;
 
-fn read_submodule_paths(gitmodules: &str) -> Result<Option<Vec<String>>, gix_config::parse::Error> {
-  let file = gix_config::File::from_str(gitmodules)?;
-  if let Some(sections) = file.sections_by_name("submodule") {
+fn read_submodule_paths(gitmodules: &str) -> Option<Vec<String>> {
+  let file = gix_config::File::from_str(gitmodules);
+  let Ok(file) = file else {
+    return None;
+  };
+
+  let sections = file.sections_by_name("submodule");
+  if let Some(sections) = sections {
     let paths = sections
-      .filter_map(|section| match section.value("path") {
-        Some(path) => Some(path.to_string()),
-        None => {
-          return None;
-        }
-      })
+      .filter_map(|section| section.value("path").map(|path| path.to_string()))
       .collect::<Vec<String>>();
-    return Ok(Some(paths));
+    Some(paths)
+  } else {
+    None
   }
-  return Ok(None);
 }
 
 #[test]
@@ -33,7 +34,7 @@ fn test_read_submodule_paths() {
             url = https://github.com/zharinov/good-enough-parser
   "#;
   let paths = read_submodule_paths(gitmodules).unwrap();
-  assert_eq!(paths, Some(vec!["foo/bar/baz".to_string()]));
+  assert_eq!(paths, vec!["foo/bar/baz".to_string()]);
 }
 
 fn get_submodule_paths(repo_path: &Path) -> Option<Vec<String>> {
@@ -41,11 +42,10 @@ fn get_submodule_paths(repo_path: &Path) -> Option<Vec<String>> {
     .join(".gitmodules")
     .to_str()
     .and_then(|gitmodules| std::fs::read_to_string(gitmodules).ok())
-    .and_then(|gitmodules| read_submodule_paths(&gitmodules).ok())
-    .unwrap_or(None)
+    .and_then(|gitmodules| read_submodule_paths(&gitmodules))
 }
 
-fn walk_repo<'a, F, Res>(repo_dir: &str, f: F) -> Vec<Res>
+fn walk_repo<F, Res>(repo_dir: &str, f: F) -> Vec<Res>
 where
   F: Fn(&Path) -> Option<Res>,
 {
@@ -107,7 +107,7 @@ where
       }
     }
 
-    return true;
+    true
   });
 
   walk_builder.sort_by_file_path(|a, b| {
@@ -120,9 +120,9 @@ where
     }
 
     if a.is_dir() {
-      return std::cmp::Ordering::Greater;
+      std::cmp::Ordering::Greater
     } else {
-      return std::cmp::Ordering::Less;
+      std::cmp::Ordering::Less
     }
   });
 
@@ -234,7 +234,7 @@ pub fn walk_repo_globs_map(
 
       let mut glob_builder = globset::GlobSetBuilder::new();
       for glob in globs {
-        let Ok(glob) = Glob::new(&glob) else {
+        let Ok(glob) = Glob::new(glob) else {
           continue;
         };
         glob_builder.add(glob);
@@ -268,12 +268,11 @@ pub fn walk_repo_globs_map(
     }
   }
 
-  let mut res: HashMap<String, Vec<String>> = HashMap::new();
+  let mut result: HashMap<String, Vec<String>> = HashMap::new();
   for (key, paths) in accum {
-    res.insert(key.to_string(), paths);
+    result.insert(key.to_string(), paths);
   }
-
-  return res;
+  result
 }
 
 #[test]
