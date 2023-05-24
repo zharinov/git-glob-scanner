@@ -6,7 +6,4 @@
 export function globToRegex(glob: string): string | null
 export function walkRepoGlob(repoDir: string, glob: string): Array<string>
 export function walkRepoGlobs(repoDir: string, globs: Array<string>): Array<string>
-export function walkRepoGlobsMap(
-  repoDir: string,
-  globsMap: Record<string, Array<string>>,
-): Record<string, Array<string>>
+export function walkRepoGlobsMap(repoDir: string, globsMap: Record<string, Array<string>>): Record<string, Array<string>>
