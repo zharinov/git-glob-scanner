@@ -10,20 +10,14 @@ use std::str::FromStr;
 use globset::Glob;
 
 fn read_submodule_paths(gitmodules: &str) -> Option<Vec<String>> {
-  let file = gix_config::File::from_str(gitmodules);
-  let Ok(file) = file else {
-    return None;
-  };
-
-  let sections = file.sections_by_name("submodule");
-  if let Some(sections) = sections {
-    let paths = sections
-      .filter_map(|section| section.value("path").map(|path| path.to_string()))
-      .collect::<Vec<String>>();
-    Some(paths)
-  } else {
-    None
-  }
+  gix_config::File::from_str(gitmodules)
+    .ok()?
+    .sections_by_name("submodule")?
+    .map(|section| {
+      let value = section.value("path")?;
+      Some(value.to_string())
+    })
+    .collect()
 }
 
 #[test]
