@@ -95,10 +95,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@napi-rs/cli@3.0.0-alpha.3":
-  version "3.0.0-alpha.3"
-  resolved "https://registry.npmjs.org/@napi-rs/cli/-/cli-3.0.0-alpha.3.tgz#53dceb5fe8f97dbc7d7fe07f7f014ea84bc2efa0"
-  integrity sha512-s5RHKqbqUVVfwgr/wO7S/vdqQ9shQzvIETgdz57r1Gg4bRv8kqy2Q1LfJAQJ09Y9Ddao9jKErvz4+11gHZZrWA==
+"@napi-rs/cli@3.0.0-alpha.4":
+  version "3.0.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@napi-rs/cli/-/cli-3.0.0-alpha.4.tgz#718caa0984678fd5237a02ed7ecc7330895ba1dd"
+  integrity sha512-WgcY5DnxRUqxptdRCQlP3rNHhuB69AdV0QvmnadoWgR7ahcJspZRQ4Cr/ODfr5OfG+CdtFQh3fKLM6LLQU/aTg==
   dependencies:
     "@octokit/rest" "^19.0.7"
     clipanion "^3.2.0"
