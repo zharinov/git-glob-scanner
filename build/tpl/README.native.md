@@ -1,4 +1,5 @@
-# `{{nativePackage}}`
+# `{{ nativePackageName }}`
 
 Normally you don't need to install this package directly.
-This is the **{{platformTarget}}** binary for `{{package}}` that meant be installed automatically.
+It contains the **{{  rustTarget }}** binary for `{{ packageName }}`.
+It is meant to be installed automatically by tools like `npm` or `yarn`.
