@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.5.2
+
+      - name: Setup Rust toolchain
+        run: |
+          rustup install --profile minimal 1.70.0
+          rustup default 1.70.0
+          cargo install cargo-xwin cargo-zigbuild
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2.4.0
+        with:
+          cache-all-crates: 'true'
+          cache-on-failure: 'true'
+
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v2.0.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 18
+          cache: 'yarn'
+
+      - name: Install Node dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn -s build
