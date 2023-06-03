@@ -22,13 +22,18 @@ jobs:
         run: |
           rustup install --profile minimal 1.70.0
           rustup default 1.70.0
-          cargo install cargo-xwin cargo-zigbuild
 
       - name: Setup Rust cache
         uses: Swatinem/rust-cache@v2.4.0
         with:
           cache-all-crates: 'true'
           cache-on-failure: 'true'
+
+      - name: Install `cargo-xwin`
+        run: cargo install cargo-xwin
+
+      - name: Install `cargo-zigbuild`
+        run: cargo install cargo-zigbuild
 
       - name: Install Zig
         uses: goto-bus-stop/setup-zig@v2.0.2
