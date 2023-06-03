@@ -107,7 +107,4 @@ async function main() {
   await pAll(tasks, { concurrency });
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+await main();
