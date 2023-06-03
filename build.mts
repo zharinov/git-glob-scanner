@@ -26,7 +26,7 @@ interface RootPackageJson {
   license: string;
 }
 
-interface PackageContext {
+interface NativePackageContext {
   rootPackageName: string;
   nativePackageName: string;
   nativePackageSuffix: string;
@@ -36,11 +36,22 @@ interface PackageContext {
   nodePlatform: NodePlatform;
   nodeArch: NodeArch;
   rootPackageJson: RootPackageJson;
+  outputLinePrefix: string;
 }
 
-function getPackages(rootPackageJson: RootPackageJson): PackageContext[] {
-  return nodePlatforms.flatMap((nodePlatform) =>
-    nodeArchitectures.map((nodeArch): PackageContext => {
+let cachedNativePackages: NativePackageContext[] | undefined;
+
+async function getNativePackages(): Promise<NativePackageContext[]> {
+  if (cachedNativePackages) {
+    return cachedNativePackages;
+  }
+
+  const rootPackageJson: RootPackageJson = await fs.readJson(upath.join(__dirname, 'package.json'));
+
+  const packageContexts: Omit<NativePackageContext, 'outputLinePrefix'>[] = [];
+  let maxSuffixLength = 0;
+  for (const nodePlatform of nodePlatforms) {
+    for (const nodeArch of nodeArchitectures) {
       const rootPackageName = packageOrg ? `${packageOrg}/${packageName}` : packageName;
 
       const nativePackageOs = {
@@ -77,7 +88,7 @@ function getPackages(rootPackageJson: RootPackageJson): PackageContext[] {
 
       const rustTargetDir = upath.join(__dirname, 'target', nativePackageSuffix, 'release');
 
-      return {
+      packageContexts.push({
         rootPackageName,
         nativePackageName,
         nativePackageSuffix,
@@ -87,9 +98,17 @@ function getPackages(rootPackageJson: RootPackageJson): PackageContext[] {
         nodePlatform,
         nodeArch,
         rootPackageJson,
-      };
-    }),
-  );
+      });
+
+      maxSuffixLength = Math.max(maxSuffixLength, nativePackageSuffix.length);
+    }
+  }
+
+  return packageContexts.map((context) => ({
+    ...context,
+    outputLinePrefix: `${context.nativePackageSuffix.padEnd(maxSuffixLength)} | `,
+    rootPackageJson,
+  }));
 }
 
 async function precompileTemplate(file: string): Promise<nunjucks.Template> {
@@ -101,7 +120,7 @@ async function precompileTemplate(file: string): Promise<nunjucks.Template> {
 
 const templates: Record<string, nunjucks.Template> = {};
 
-async function render(tplName: string, context: PackageContext): Promise<string> {
+async function render(tplName: string, context: NativePackageContext): Promise<string> {
   const tpl = templates[tplName] ?? (await precompileTemplate(tplName));
   templates[tplName] = tpl;
   return tpl.render(context);
@@ -176,52 +195,75 @@ async function exec(command: string, args: string[], outputPrefix: string = ''):
   });
 }
 
-async function task(context: PackageContext, stdoutPrefix: string) {
-  const { nativePackageDir } = context;
-
-  await fs.ensureDir(nativePackageDir);
-
-  const readme = await render('README.native.md', context);
-  const readmePath = upath.join(nativePackageDir, 'README.md');
-  await fs.writeFile(readmePath, readme);
-
-  const packageJson = await render('package.native.json', context);
-  const packageJsonPath = upath.join(nativePackageDir, 'package.json');
-  await fs.writeFile(packageJsonPath, packageJson);
-
-  await exec('rustup', ['target', 'add', context.rustTargetTriple], stdoutPrefix);
-
-  await exec(
-    'yarn',
-    [
-      '--silent',
-      'napi',
-      'build',
-      '--target',
-      context.rustTargetTriple,
-      '--target-dir',
-      context.rustTargetDir,
-      '--output-dir',
-      nativePackageDir,
-      '--strip',
-      '--release',
-      '--cross-compile',
-    ],
-    stdoutPrefix,
+async function installRustTargets(): Promise<void> {
+  const packages = await getNativePackages();
+  const tasks = packages.map(
+    (pkg) => () => exec('rustup', ['target', 'add', pkg.rustTargetTriple], pkg.outputLinePrefix),
   );
+  await pAll(tasks);
+}
+
+async function createDistFolders() {
+  const packages = await getNativePackages();
+
+  const tasks = packages.map((pkg) => async () => {
+    const { nativePackageDir } = pkg;
+
+    await fs.ensureDir(nativePackageDir);
+
+    const readme = await render('README.native.md', pkg);
+    const readmePath = upath.join(nativePackageDir, 'README.md');
+    await fs.writeFile(readmePath, readme);
+
+    const packageJson = await render('package.native.json', pkg);
+    const packageJsonPath = upath.join(nativePackageDir, 'package.json');
+    await fs.writeFile(packageJsonPath, packageJson);
+  });
+
+  await pAll(tasks);
+}
+
+async function buildNodeBinaries() {
+  const packages = await getNativePackages();
+
+  const tasks = packages.map((pkg) => async () => {
+    await exec(
+      'yarn',
+      [
+        '--silent',
+        'napi',
+        'build',
+        '--target',
+        pkg.rustTargetTriple,
+        '--target-dir',
+        pkg.rustTargetDir,
+        '--output-dir',
+        pkg.nativePackageDir,
+        '--strip',
+        '--release',
+        '--cross-compile',
+      ],
+      pkg.outputLinePrefix,
+    );
+  });
+
+  await pAll(tasks, { concurrency: os.cpus().length });
 }
 
 async function main() {
-  const rootPackageJson: RootPackageJson = await fs.readJson(upath.join(__dirname, 'package.json'));
-  const nativePackages = getPackages(rootPackageJson);
-  const stdoutPrefixLength = 1 + Math.max(...nativePackages.map((context) => context.nativePackageSuffix.length));
-  const tasks = nativePackages.map((context) => {
-    const stdoutPrefix = `${context.nativePackageSuffix.padEnd(stdoutPrefixLength)}| `;
-    return () => task(context, stdoutPrefix);
-  });
+  const [command] = process.argv.slice(2);
 
-  const concurrency = os.cpus().length + 1;
-  await pAll(tasks, { concurrency });
+  if (command === 'install-rust-targets') {
+    await installRustTargets();
+  } else if (command === 'create-dist-folders') {
+    await createDistFolders();
+  } else if (command === 'build-node-binaries') {
+    await buildNodeBinaries();
+  } else {
+    await installRustTargets();
+    await createDistFolders();
+    await buildNodeBinaries();
+  }
 }
 
 await main();

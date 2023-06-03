@@ -6,7 +6,10 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf dist target",
-    "build": "ts-node-esm build.mts"
+    "build": "ts-node-esm build.mts",
+    "build:install-rust-targets": "ts-node-esm build.mts install-rust-targets",
+    "build:create-dist-folders": "ts-node-esm build.mts create-dist-folders",
+    "build:build-node-binaries": "ts-node-esm build.mts build-node-binaries"
   },
   "devDependencies": {
     "@napi-rs/cli": "3.0.0-alpha.4",
