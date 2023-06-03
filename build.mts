@@ -13,10 +13,12 @@ const packageOrg: string | undefined = '@jrnv' as const;
 const packageName = 'git-glob-scanner' as const;
 
 type NodePlatform = 'win32' | 'darwin' | 'linux';
-const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
+const nodePlatforms = ['win32'] as const;
+// const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
 
 type NodeArch = 'arm64' | 'x64' | 'ia32';
-const nodeArchitectures = ['arm64', 'x64'] as const;
+const nodeArchitectures = ['arm64'] as const;
+// const nodeArchitectures = ['arm64', 'x64'] as const;
 
 interface RootPackageJson {
   name: string;
