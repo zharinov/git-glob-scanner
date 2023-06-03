@@ -13,8 +13,7 @@ const packageOrg: string | undefined = '@jrnv' as const;
 const packageName = 'git-glob-scanner' as const;
 
 type NodePlatform = 'win32' | 'darwin' | 'linux';
-// const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
-const nodePlatforms = ['darwin', 'linux'] as const;
+const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
 
 type NodeArch = 'arm64' | 'x64' | 'ia32';
 const nodeArchitectures = ['arm64', 'x64'] as const;
@@ -226,8 +225,10 @@ async function createDistFolders() {
 
 async function buildNodeBinaries() {
   const packages = await getNativePackages();
+  const windowsPackages = packages.filter((pkg) => pkg.nodePlatform === 'win32');
+  const nonWindowsPackages = packages.filter((pkg) => pkg.nodePlatform !== 'win32');
 
-  const tasks = packages.map((pkg) => async () => {
+  const createTask = (pkg: NativePackageContext) => async () => {
     await exec(
       'yarn',
       [
@@ -246,9 +247,13 @@ async function buildNodeBinaries() {
       ],
       pkg.outputLinePrefix,
     );
-  });
+  };
 
-  await pAll(tasks, { concurrency: os.cpus().length });
+  const windowsTasks = windowsPackages.map(createTask);
+  const nonWindowsTasks = nonWindowsPackages.map(createTask);
+
+  await pAll(windowsTasks, { concurrency: 1 });
+  await pAll(nonWindowsTasks, { concurrency: os.cpus().length });
 }
 
 async function main() {
