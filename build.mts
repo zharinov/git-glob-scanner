@@ -12,10 +12,10 @@ const distDir = upath.join(__dirname, 'dist');
 const packageOrg: string | undefined = '@jrnv' as const;
 const packageName = 'git-glob-scanner' as const;
 
-type NodePlatform = 'linux' | 'win32' | 'darwin';
-const nodePlatforms = ['linux', 'win32', 'darwin'] as const;
+type NodePlatform = 'win32' | 'darwin' | 'linux';
+const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
 
-type NodeArch = 'ia32' | 'x64' | 'arm64';
+type NodeArch = 'arm64' | 'x64' | 'ia32';
 const nodeArchitectures = ['arm64', 'x64'] as const;
 
 interface RootPackageJson {

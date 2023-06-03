@@ -47,7 +47,7 @@ jobs:
       - name: Install Node dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Install Rust targes
+      - name: Install Rust targets
         run: yarn -s build:install-rust-targets
 
       - name: Create dist folders
