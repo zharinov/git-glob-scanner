@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "composite": true,
     "strict": true,
-    "moduleResolution": "node",
-    "module": "CommonJS",
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true,
+    "target": "es2022",
+    "module": "es2022",
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "moduleResolution": "nodenext",
+    "declaration": true
   },
-  "include": ["."],
-  "exclude": ["node_modules"],
-  "ts-node": {
-    "swc": true
-  }
+  "exclude": ["node_modules"]
 }
