@@ -30,10 +30,10 @@ jobs:
           cache-on-failure: 'true'
 
       - name: Install `cargo-xwin`
-        run: cargo install cargo-xwin
+        run: cargo install --target-dir target/cargo-xwin cargo-xwin
 
       - name: Install `cargo-zigbuild`
-        run: cargo install cargo-zigbuild
+        run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
 
       - name: Install Zig
         uses: goto-bus-stop/setup-zig@v2.0.2
