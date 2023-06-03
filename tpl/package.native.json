@@ -1,0 +1,24 @@
+{
+  "name": "{{ nativePackageName }}",
+  "version": "{{ rootPackageJson.version }}",
+  "description": "{{ rootPackageJson.description }}",
+  "repository": "{{ rootPackageJson.repository }}",
+  "license": "{{ rootPackageJson.license }}",
+  "os": [
+    "{{ nodePlatform }}"
+  ],
+  "cpu": [
+    "{{ nodeArch }}"
+  ],
+  "main": "git-glob-scanner.{{ nativePackageSuffix }}.node",
+  "files": [
+    "git-glob-scanner.{{ nativePackageSuffix }}.node"
+  ],
+  "engines": {
+    "node": ">= 10"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}
