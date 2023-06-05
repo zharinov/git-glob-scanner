@@ -10,9 +10,10 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  ZIG_VERSION: 0.10.1
 
 jobs:
-  setup:
+  setup-node:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,8 +28,22 @@ jobs:
       - name: Install Node dependencies
         run: yarn install --frozen-lockfile
 
+  setup-zig:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v2.0.2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+
+      - name: Cache Zig
+        uses: actions/cache@v3.3.1
+        with:
+          key: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
+
   build:
-    needs: setup
+    needs: [setup-node, setup-zig]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -66,6 +81,12 @@ jobs:
       - name: Install `cargo-zigbuild`
         if: matrix.os != 'windows'
         run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+
+      - name: Restore Zig from cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
 
       - name: Install Zig
         if: matrix.os != 'windows'
