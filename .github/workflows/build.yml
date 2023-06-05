@@ -78,11 +78,11 @@ jobs:
       - name: Restore `cargo-xwin` from cache
         uses: actions/cache@v3.3.1
         with:
-          key: cargo-xwin-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-          path: target/cargo-xwin
+          key: cargo-xwin-rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: ~/.cargo/bin/cargo-xwin
 
       - name: Install `cargo-xwin`
-        run: cargo install --target-dir target/cargo-xwin cargo-xwin
+        run: test -f ~/.cargo/bin/cargo-xwin || cargo install cargo-xwin
 
   setup-cargo-zigbuild:
     needs: [setup-rust]
@@ -102,11 +102,11 @@ jobs:
       - name: Restore `cargo-zigbuild` from cache
         uses: actions/cache@v3.3.1
         with:
-          key: cargo-zigbuild-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-          path: target/cargo-zigbuild
+          key: cargo-zigbuild-rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: ~/.cargo/bin/cargo-zigbuild
 
       - name: Install `cargo-zigbuild`
-        run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+        run: cargo install cargo-zigbuild
 
   build:
     needs: [setup-node, setup-zig, setup-rust, setup-cargo-xwin, setup-cargo-zigbuild]
@@ -158,23 +158,23 @@ jobs:
         if: matrix.os == 'windows'
         uses: actions/cache@v3.3.1
         with:
-          key: cargo-xwin-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          key: cargo-xwin-rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: target/cargo-xwin
 
       - name: Install `cargo-xwin`
         if: matrix.os == 'windows'
-        run: cargo install --target-dir target/cargo-xwin cargo-xwin
+        run: test -f test -f ~/.cargo/bin/cargo-xwin || cargo install --target-dir target/cargo-xwin cargo-xwin
 
       - name: Restore `cargo-zigbuild` from cache
         if: matrix.os != 'windows'
         uses: actions/cache@v3.3.1
         with:
-          key: cargo-zigbuild-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          key: cargo-zigbuild-rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: target/cargo-zigbuild
 
       - name: Install `cargo-zigbuild`
         if: matrix.os != 'windows'
-        run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+        run: test -f ~/.cargo/bin/cargo-zigbuild || cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
 
       - name: Restore Zig from cache
         if: matrix.os != 'windows'
