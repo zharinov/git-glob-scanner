@@ -25,8 +25,17 @@ jobs:
           node-version: 18
           cache: 'yarn'
 
-      - name: Install Node dependencies
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Tar dependencies
+        run: tar -czf node_modules.tar node_modules
+
+      - name: Upload dependencies
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: node_modules
+          path: node_modules.tar
 
   setup-zig:
     runs-on: ubuntu-latest
@@ -40,6 +49,12 @@ jobs:
         uses: actions/cache@v3.3.1
         with:
           key: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
+
+      - name: Upload Zig
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
 
   build:
@@ -58,10 +73,15 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: 18
-          cache: 'yarn'
 
-      - name: Install Node dependencies
-        run: yarn install --frozen-lockfile
+      - name: Restore node_modules
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: node_modules
+          path: node_modules.tar
+
+      - name: Extract node_modules
+        run: tar -xf node_modules.tar
 
       - name: Setup Rust toolchain
         run: |
@@ -85,14 +105,9 @@ jobs:
       - name: Restore Zig from cache
         uses: actions/cache@v3.3.1
         with:
+          fail-on-cache-miss: true
           key: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
-
-      - name: Install Zig
-        if: matrix.os != 'windows'
-        uses: goto-bus-stop/setup-zig@v2.0.2
-        with:
-          version: 0.10.1
 
       # - name: Install Rust targets
       #   run: yarn -s build:install-rust-targets
