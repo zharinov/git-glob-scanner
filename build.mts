@@ -296,25 +296,20 @@ async function buildNodeBinaries() {
 
 async function buildNodeBinary(target?: string) {
   const pkg = await getPkg(target);
-
-  await exec(
-    'yarn',
-    [
-      '--silent',
-      'napi',
-      'build',
-      '--target',
-      pkg.rustTargetTriple,
-      '--target-dir',
-      pkg.rustTargetDir,
-      '--output-dir',
-      pkg.nativePackageDir,
-      '--strip',
-      '--release',
-      '--cross-compile',
-    ],
-    pkg.outputLinePrefix,
-  );
+  await exec('yarn', [
+    '--silent',
+    'napi',
+    'build',
+    '--target',
+    pkg.rustTargetTriple,
+    '--target-dir',
+    pkg.rustTargetDir,
+    '--output-dir',
+    pkg.nativePackageDir,
+    '--strip',
+    '--release',
+    '--cross-compile',
+  ]);
 }
 
 async function main() {
