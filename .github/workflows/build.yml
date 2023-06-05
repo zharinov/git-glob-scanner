@@ -153,6 +153,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.arch }}
           cache-all-crates: true
           cache-on-failure: true
+          cache-targets: false
 
       - name: Cache `cargo-xwin`
         if: matrix.os == 'windows'
@@ -191,6 +192,12 @@ jobs:
 
       - name: Install Rust target
         run: yarn -s build:install-rust-target "${{ matrix.os }}-${{ matrix.arch }}"
+
+      - name: Cache `target` folder
+        uses: actions/cache@v3.3.1
+        with:
+          key: target-folder-rust-${{ env.RUST_VERSION }}-${{ matrix.os }}-${{ matrix.arch }}
+          path: target
 
       - name: Create dist folder
         run: yarn -s build:create-dist-folder "${{ matrix.os }}-${{ matrix.arch }}"
