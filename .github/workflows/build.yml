@@ -12,7 +12,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,33 +27,49 @@ jobs:
       - name: Install Node dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Setup Rust toolchain
-        run: |
-          rustup install --profile minimal 1.70.0
-          rustup default 1.70.0
+  build:
+    depends-on: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.5.2
 
-      - name: Setup Rust cache
-        uses: Swatinem/rust-cache@v2.4.0
+      - name: Setup Node
+        uses: actions/setup-node@v3.6.0
         with:
-          cache-all-crates: 'true'
-          cache-on-failure: 'true'
+          node-version: 18
+          cache: 'yarn'
 
-      - name: Install `cargo-xwin`
-        run: cargo install --target-dir target/cargo-xwin cargo-xwin
+      - name: Install Node dependencies
+        run: yarn install --frozen-lockfile
 
-      - name: Install `cargo-zigbuild`
-        run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+      # - name: Setup Rust toolchain
+      #   run: |
+      #     rustup install --profile minimal 1.70.0
+      #     rustup default 1.70.0
 
-      - name: Install Zig
-        uses: goto-bus-stop/setup-zig@v2.0.2
-        with:
-          version: 0.10.1
+      # - name: Setup Rust cache
+      #   uses: Swatinem/rust-cache@v2.4.0
+      #   with:
+      #     cache-all-crates: 'true'
+      #     cache-on-failure: 'true'
 
-      - name: Install Rust targets
-        run: yarn -s build:install-rust-targets
+      # - name: Install `cargo-xwin`
+      #   run: cargo install --target-dir target/cargo-xwin cargo-xwin
 
-      - name: Create dist folders
-        run: yarn -s build:create-dist-folders
+      # - name: Install `cargo-zigbuild`
+      #   run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
 
-      - name: Build node binaries
-        run: yarn -s build:build-node-binaries
+      # - name: Install Zig
+      #   uses: goto-bus-stop/setup-zig@v2.0.2
+      #   with:
+      #     version: 0.10.1
+
+      # - name: Install Rust targets
+      #   run: yarn -s build:install-rust-targets
+
+      # - name: Create dist folders
+      #   run: yarn -s build:create-dist-folders
+
+      # - name: Build node binaries
+      #   run: yarn -s build:build-node-binaries
