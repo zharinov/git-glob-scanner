@@ -31,22 +31,16 @@ jobs:
   setup-zig:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Zig
-        uses: goto-bus-stop/setup-zig@v2.0.2
-        with:
-          version: ${{ env.ZIG_VERSION }}
-
       - name: Cache Zig
         uses: actions/cache@v3.3.1
         with:
           key: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
 
-      - name: Upload Zig
-        uses: actions/upload-artifact@v3.1.2
+      - name: Install Zig
+        uses: goto-bus-stop/setup-zig@v2.0.2
         with:
-          name: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-          path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
+          version: ${{ env.ZIG_VERSION }}
 
   build:
     needs: [setup-node, setup-zig]
@@ -89,11 +83,17 @@ jobs:
         run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
 
       - name: Restore Zig from cache
+        if: matrix.os != 'windows'
         uses: actions/cache@v3.3.1
         with:
-          fail-on-cache-miss: true
           key: zig-${{ env.ZIG_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: /opt/hostedtoolcache/zig/${{ env.ZIG_VERSION }}
+
+      - name: Install Zig
+        if: matrix.os != 'windows'
+        uses: goto-bus-stop/setup-zig@v2.0.2
+        with:
+          version: ${{ env.ZIG_VERSION }}
 
       # - name: Install Rust targets
       #   run: yarn -s build:install-rust-targets
