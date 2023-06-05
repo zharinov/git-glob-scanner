@@ -28,7 +28,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
   build:
-    depends-on: setup
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
