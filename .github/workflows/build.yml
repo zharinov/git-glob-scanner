@@ -106,7 +106,7 @@ jobs:
           path: ~/.cargo/bin/cargo-zigbuild
 
       - name: Install `cargo-zigbuild`
-        run: cargo install cargo-zigbuild
+        run: test -f ~/.cargo/bin/cargo-zigbuild || cargo install cargo-zigbuild
 
   build:
     needs: [setup-node, setup-zig, setup-rust, setup-cargo-xwin, setup-cargo-zigbuild]
