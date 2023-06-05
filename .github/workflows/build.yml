@@ -159,18 +159,18 @@ jobs:
         uses: actions/cache@v3.3.1
         with:
           key: cargo-xwin-rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-          path: target/cargo-xwin
+          path: ~/.cargo/bin/cargo-xwin
 
       - name: Install `cargo-xwin`
         if: matrix.os == 'windows'
-        run: test -f test -f ~/.cargo/bin/cargo-xwin || cargo install cargo-xwin
+        run: test -f ~/.cargo/bin/cargo-xwin || cargo install cargo-xwin
 
       - name: Cache `cargo-zigbuild`
         if: matrix.os != 'windows'
         uses: actions/cache@v3.3.1
         with:
           key: cargo-zigbuild-rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-          path: target/cargo-zigbuild
+          path: ~/.cargo/bin/cargo-zigbuild
 
       - name: Install `cargo-zigbuild`
         if: matrix.os != 'windows'
