@@ -195,6 +195,44 @@ async function exec(command: string, args: string[], outputPrefix: string = ''):
   });
 }
 
+async function getPkg(target?: string): Promise<NativePackageContext> {
+  if (!target) {
+    throw new Error('No target specified');
+  }
+
+  const packages = await getNativePackages();
+  const suffix = target.toLowerCase();
+
+  const pkg = packages.find((pkg) => pkg.nativePackageSuffix === suffix);
+  if (!pkg) {
+    const availableTargets = packages.map((pkg) => pkg.nativePackageSuffix).join(', ');
+    throw new Error(`Unknown target ${suffix} (available targets: ${availableTargets})`);
+  }
+
+  return pkg;
+}
+
+async function installRustTarget(target?: string): Promise<void> {
+  const pkg = await getPkg(target);
+  await exec('rustup', ['target', 'add', pkg.rustTargetTriple]);
+}
+
+async function rustTargetManifest(target?: string, toolchain?: string): Promise<void> {
+  const pkg = await getPkg(target);
+  if (!toolchain) {
+    throw new Error('No toolchain specified');
+  }
+  console.log(`~/.rustup/toolchains/${toolchain}/lib/rustlib/manifest-rust-std-${pkg.rustTargetTriple}`);
+}
+
+async function rustTargetDir(target?: string, toolchain?: string): Promise<void> {
+  const pkg = await getPkg(target);
+  if (!toolchain) {
+    throw new Error('No toolchain specified');
+  }
+  console.log(`~/.rustup/toolchains/${toolchain}/lib/rustlib/${pkg.rustTargetTriple}`);
+}
+
 async function installRustTargets(): Promise<void> {
   const packages = await getNativePackages();
   const tasks = packages.map(
@@ -257,10 +295,16 @@ async function buildNodeBinaries() {
 }
 
 async function main() {
-  const [command] = process.argv.slice(2);
+  const [command, target, toolchain] = process.argv.slice(2);
 
   if (command === 'install-rust-targets') {
     await installRustTargets();
+  } else if (command === 'install-rust-target') {
+    await installRustTarget(target);
+  } else if (command === 'rust-target-manifest') {
+    await rustTargetManifest(target, toolchain);
+  } else if (command === 'rust-target-dir') {
+    await rustTargetDir(target, toolchain);
   } else if (command === 'create-dist-folders') {
     await createDistFolders();
   } else if (command === 'build-node-binaries') {

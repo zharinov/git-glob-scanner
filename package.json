@@ -8,6 +8,9 @@
     "clean": "rimraf dist target",
     "build": "ts-node-esm build.mts",
     "build:install-rust-targets": "ts-node-esm build.mts install-rust-targets",
+    "build:install-rust-target": "ts-node-esm build.mts install-rust-target",
+    "build:rust-target-manifest": "ts-node-esm build.mts rust-target-manifest",
+    "build:rust-target-dir": "ts-node-esm build.mts rust-target-dir",
     "build:create-dist-folders": "ts-node-esm build.mts create-dist-folders",
     "build:build-node-binaries": "ts-node-esm build.mts build-node-binaries"
   },

@@ -125,7 +125,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Cache node_modules
+      - name: Restore `node_modules` from cache
         uses: actions/cache@v3.3.1
         with:
           key: node_modules-${{ hashFiles('**/yarn.lock') }}
@@ -141,9 +141,11 @@ jobs:
           path: ~/.rustup/toolchains/${{ env.RUST_VERSION }}-*
 
       - name: Setup Rust toolchain
+        id: rust-toolchain
         run: |
           rustup install --profile minimal ${{ env.RUST_VERSION }}
           rustup default ${{ env.RUST_VERSION }}
+          echo "rust-toolchain=$(rustup show active-toolchain | awk '{print $1}')" >> "$GITHUB_OUTPUT"
 
       - name: Setup Rust cache
         uses: Swatinem/rust-cache@v2.4.0
@@ -186,8 +188,29 @@ jobs:
         with:
           version: ${{ env.ZIG_VERSION }}
 
-      # - name: Install Rust targets
-      #   run: yarn -s build:install-rust-targets
+      - name: Detect Rust target
+        id: rust-target
+        env:
+          TARGET: ${{ matrix.os }}-${{ matrix.arch }}
+          TOOLCHAIN: ${{ steps.rust-toolchain.outputs.rust-toolchain }}
+        run: |
+          echo "target-manifest=$(yarn -s build:rust-target-manifest $TARGET $TOOLCHAIN)" >> "$GITHUB_OUTPUT"
+          echo "target-dir=$(yarn -s build:rust-target-dir $TARGET $TOOLCHAIN)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Rust target
+        uses: actions/cache@v3.3.1
+        env:
+          TARGET: ${{ matrix.os }}-${{ matrix.arch }}
+          TARGET_MANIFEST: ${{ steps.rust-target.outputs.target-manifest }}
+          TARGET_DIR: ${{ steps.rust-target.outputs.target-dir }}
+        with:
+          key: rust-target-${{ env.TARGET }}-${{ hashFiles(env.TARGET_MANIFEST) }}
+          path: |
+            ${{ env.TARGET_MANIFEST }}
+            ${{ env.TARGET_DIR }}
+
+      - name: Install Rust target
+        run: yarn -s build:install-rust-target "${{ matrix.os }}-${{ matrix.arch }}"
 
       # - name: Create dist folders
       #   run: yarn -s build:create-dist-folders
