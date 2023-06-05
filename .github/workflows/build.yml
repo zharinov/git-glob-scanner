@@ -46,17 +46,65 @@ jobs:
   setup-rust:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Rust toolchain
-        run: rustup install --profile minimal ${{ env.RUST_VERSION }}
-
       - name: Cache Rust toolchain
         uses: actions/cache@v3.3.1
         with:
           key: rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
           path: ~/.rustup/toolchains/${{ env.RUST_VERSION }}-*
 
+      - name: Install Rust toolchain
+        run: rustup install --profile minimal ${{ env.RUST_VERSION }}
+
+  setup-cargo-xwin:
+    needs: [setup-rust]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore Rust toolchain from cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: ~/.rustup/toolchains/${{ env.RUST_VERSION }}-*
+
+      - name: Setup Rust toolchain
+        run: |
+          rustup install --profile minimal ${{ env.RUST_VERSION }}
+          rustup default ${{ env.RUST_VERSION }}
+
+      - name: Restore `cargo-xwin` from cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: cargo-xwin-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: target/cargo-xwin
+
+      - name: Install `cargo-xwin`
+        run: cargo install --target-dir target/cargo-xwin cargo-xwin
+
+  setup-cargo-zigbuild:
+    needs: [setup-rust]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore Rust toolchain from cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: ~/.rustup/toolchains/${{ env.RUST_VERSION }}-*
+
+      - name: Setup Rust toolchain
+        run: |
+          rustup install --profile minimal ${{ env.RUST_VERSION }}
+          rustup default ${{ env.RUST_VERSION }}
+
+      - name: Restore `cargo-zigbuild` from cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: cargo-zigbuild-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: target/cargo-zigbuild
+
+      - name: Install `cargo-zigbuild`
+        run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+
   build:
-    needs: [setup-node, setup-zig, setup-rust]
+    needs: [setup-node, setup-zig, setup-rust, setup-cargo-xwin, setup-cargo-zigbuild]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -76,11 +124,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Restore Rust toolchain
+      - name: Restore Rust toolchain from cache
         uses: actions/cache@v3.3.1
         with:
           key: rust-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
-          path: ~/.rustup/toolchains
+          path: ~/.rustup/toolchains/${{ env.RUST_VERSION }}-*
 
       - name: Setup Rust toolchain
         run: |
@@ -93,9 +141,23 @@ jobs:
           cache-all-crates: 'true'
           cache-on-failure: 'true'
 
+      - name: Restore `cargo-xwin` from cache
+        if: matrix.os == 'windows'
+        uses: actions/cache@v3.3.1
+        with:
+          key: cargo-xwin-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: target/cargo-xwin
+
       - name: Install `cargo-xwin`
         if: matrix.os == 'windows'
         run: cargo install --target-dir target/cargo-xwin cargo-xwin
+
+      - name: Restore `cargo-zigbuild` from cache
+        if: matrix.os != 'windows'
+        uses: actions/cache@v3.3.1
+        with:
+          key: cargo-zigbuild-${{ env.RUST_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+          path: target/cargo-zigbuild
 
       - name: Install `cargo-zigbuild`
         if: matrix.os != 'windows'
