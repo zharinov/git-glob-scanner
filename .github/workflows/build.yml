@@ -204,7 +204,7 @@ jobs:
           TARGET_MANIFEST: ${{ steps.rust-target.outputs.target-manifest }}
           TARGET_DIR: ${{ steps.rust-target.outputs.target-dir }}
         with:
-          key: rust-target-${{ env.TARGET }}-${{ hashFiles(env.TARGET_MANIFEST) }}
+          key: rust-target-${{ env.TARGET }}-${{ hashFiles(steps.rust-target.outputs.target-manifest) }}
           path: |
             ${{ env.TARGET_MANIFEST }}
             ${{ env.TARGET_DIR }}
