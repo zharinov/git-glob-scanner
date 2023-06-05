@@ -30,6 +30,11 @@ jobs:
   build:
     needs: setup
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['linux', 'windows', 'macos']
+        arch: ['x64', 'arm64']
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.5.2
@@ -43,27 +48,30 @@ jobs:
       - name: Install Node dependencies
         run: yarn install --frozen-lockfile
 
-      # - name: Setup Rust toolchain
-      #   run: |
-      #     rustup install --profile minimal 1.70.0
-      #     rustup default 1.70.0
+      - name: Setup Rust toolchain
+        run: |
+          rustup install --profile minimal 1.70.0
+          rustup default 1.70.0
 
-      # - name: Setup Rust cache
-      #   uses: Swatinem/rust-cache@v2.4.0
-      #   with:
-      #     cache-all-crates: 'true'
-      #     cache-on-failure: 'true'
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2.4.0
+        with:
+          cache-all-crates: 'true'
+          cache-on-failure: 'true'
 
-      # - name: Install `cargo-xwin`
-      #   run: cargo install --target-dir target/cargo-xwin cargo-xwin
+      - name: Install `cargo-xwin`
+        if: matrix.os == 'windows'
+        run: cargo install --target-dir target/cargo-xwin cargo-xwin
 
-      # - name: Install `cargo-zigbuild`
-      #   run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+      - name: Install `cargo-zigbuild`
+        if: matrix.os != 'windows'
+        run: cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
 
-      # - name: Install Zig
-      #   uses: goto-bus-stop/setup-zig@v2.0.2
-      #   with:
-      #     version: 0.10.1
+      - name: Install Zig
+        if: matrix.os != 'windows'
+        uses: goto-bus-stop/setup-zig@v2.0.2
+        with:
+          version: 0.10.1
 
       # - name: Install Rust targets
       #   run: yarn -s build:install-rust-targets
