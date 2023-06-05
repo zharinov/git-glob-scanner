@@ -188,27 +188,6 @@ jobs:
         with:
           version: ${{ env.ZIG_VERSION }}
 
-      - name: Detect Rust target
-        id: rust-target
-        env:
-          TARGET: ${{ matrix.os }}-${{ matrix.arch }}
-          TOOLCHAIN: ${{ steps.rust-toolchain.outputs.rust-toolchain }}
-        run: |
-          echo "target-manifest=$(yarn -s build:rust-target-manifest $TARGET $TOOLCHAIN)" >> "$GITHUB_OUTPUT"
-          echo "target-dir=$(yarn -s build:rust-target-dir $TARGET $TOOLCHAIN)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Rust target
-        uses: actions/cache@v3.3.1
-        env:
-          TARGET: ${{ matrix.os }}-${{ matrix.arch }}
-          TARGET_MANIFEST: ${{ steps.rust-target.outputs.target-manifest }}
-          TARGET_DIR: ${{ steps.rust-target.outputs.target-dir }}
-        with:
-          key: rust-target-${{ env.TARGET }}-${{ hashFiles(steps.rust-target.outputs.target-manifest) }}
-          path: |
-            ${{ env.TARGET_MANIFEST }}
-            ${{ env.TARGET_DIR }}
-
       - name: Install Rust target
         run: yarn -s build:install-rust-target "${{ matrix.os }}-${{ matrix.arch }}"
 
