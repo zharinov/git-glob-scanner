@@ -217,22 +217,6 @@ async function installRustTarget(target?: string): Promise<void> {
   await exec('rustup', ['target', 'add', pkg.rustTargetTriple]);
 }
 
-async function rustTargetManifest(target?: string, toolchain?: string): Promise<void> {
-  const pkg = await getPkg(target);
-  if (!toolchain) {
-    throw new Error('No toolchain specified');
-  }
-  console.log(`~/.rustup/toolchains/${toolchain}/lib/rustlib/manifest-rust-std-${pkg.rustTargetTriple}`);
-}
-
-async function rustTargetDir(target?: string, toolchain?: string): Promise<void> {
-  const pkg = await getPkg(target);
-  if (!toolchain) {
-    throw new Error('No toolchain specified');
-  }
-  console.log(`~/.rustup/toolchains/${toolchain}/lib/rustlib/${pkg.rustTargetTriple}`);
-}
-
 async function installRustTargets(): Promise<void> {
   const packages = await getNativePackages();
   const tasks = packages.map(
@@ -259,6 +243,22 @@ async function createDistFolders() {
   });
 
   await pAll(tasks);
+}
+
+async function createDistFolder(target?: string): Promise<void> {
+  const pkg = await getPkg(target);
+
+  const { nativePackageDir } = pkg;
+
+  await fs.ensureDir(nativePackageDir);
+
+  const readme = await render('README.native.md', pkg);
+  const readmePath = upath.join(nativePackageDir, 'README.md');
+  await fs.writeFile(readmePath, readme);
+
+  const packageJson = await render('package.native.json', pkg);
+  const packageJsonPath = upath.join(nativePackageDir, 'package.json');
+  await fs.writeFile(packageJsonPath, packageJson);
 }
 
 async function buildNodeBinaries() {
@@ -294,21 +294,44 @@ async function buildNodeBinaries() {
   await pAll(nonWindowsTasks, { concurrency: os.cpus().length });
 }
 
+async function buildNodeBinary(target?: string) {
+  const pkg = await getPkg(target);
+
+  await exec(
+    'yarn',
+    [
+      '--silent',
+      'napi',
+      'build',
+      '--target',
+      pkg.rustTargetTriple,
+      '--target-dir',
+      pkg.rustTargetDir,
+      '--output-dir',
+      pkg.nativePackageDir,
+      '--strip',
+      '--release',
+      '--cross-compile',
+    ],
+    pkg.outputLinePrefix,
+  );
+}
+
 async function main() {
-  const [command, target, toolchain] = process.argv.slice(2);
+  const [command, target] = process.argv.slice(2);
 
   if (command === 'install-rust-targets') {
     await installRustTargets();
   } else if (command === 'install-rust-target') {
     await installRustTarget(target);
-  } else if (command === 'rust-target-manifest') {
-    await rustTargetManifest(target, toolchain);
-  } else if (command === 'rust-target-dir') {
-    await rustTargetDir(target, toolchain);
   } else if (command === 'create-dist-folders') {
     await createDistFolders();
+  } else if (command === 'create-dist-folder') {
+    await createDistFolder(target);
   } else if (command === 'build-node-binaries') {
     await buildNodeBinaries();
+  } else if (command === 'build-node-binary') {
+    await buildNodeBinary(target);
   } else {
     await installRustTargets();
     await createDistFolders();

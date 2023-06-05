@@ -191,8 +191,8 @@ jobs:
       - name: Install Rust target
         run: yarn -s build:install-rust-target "${{ matrix.os }}-${{ matrix.arch }}"
 
-      # - name: Create dist folders
-      #   run: yarn -s build:create-dist-folders
+      - name: Create dist folder
+        run: yarn -s build:create-dist-folder "${{ matrix.os }}-${{ matrix.arch }}"
 
-      # - name: Build node binaries
-      #   run: yarn -s build:build-node-binaries
+      - name: Build node binary
+        run: yarn -s build:build-node-binary "${{ matrix.os }}-${{ matrix.arch }}"
