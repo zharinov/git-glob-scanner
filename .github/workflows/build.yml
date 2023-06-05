@@ -28,15 +28,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Tar dependencies
-        run: tar -czf node_modules.tar node_modules
-
-      - name: Upload dependencies
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: node_modules
-          path: node_modules.tar
-
   setup-zig:
     runs-on: ubuntu-latest
     steps:
@@ -73,15 +64,10 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: 18
+          cache: 'yarn'
 
-      - name: Restore node_modules
-        uses: actions/download-artifact@v3.0.2
-        with:
-          name: node_modules
-          path: node_modules.tar
-
-      - name: Extract node_modules
-        run: tar -xf node_modules.tar
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Setup Rust toolchain
         run: |
