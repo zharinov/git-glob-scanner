@@ -151,8 +151,8 @@ jobs:
         uses: Swatinem/rust-cache@v2.4.0
         with:
           key: ${{ matrix.os }}-${{ matrix.arch }}
-          cache-all-crates: 'true'
-          cache-on-failure: 'true'
+          cache-all-crates: true
+          cache-on-failure: true
 
       - name: Restore `cargo-xwin` from cache
         if: matrix.os == 'windows'
@@ -163,7 +163,7 @@ jobs:
 
       - name: Install `cargo-xwin`
         if: matrix.os == 'windows'
-        run: test -f test -f ~/.cargo/bin/cargo-xwin || cargo install --target-dir target/cargo-xwin cargo-xwin
+        run: test -f test -f ~/.cargo/bin/cargo-xwin || cargo install cargo-xwin
 
       - name: Restore `cargo-zigbuild` from cache
         if: matrix.os != 'windows'
@@ -174,7 +174,7 @@ jobs:
 
       - name: Install `cargo-zigbuild`
         if: matrix.os != 'windows'
-        run: test -f ~/.cargo/bin/cargo-zigbuild || cargo install --target-dir target/cargo-zigbuild cargo-zigbuild
+        run: test -f ~/.cargo/bin/cargo-zigbuild || cargo install cargo-zigbuild
 
       - name: Restore Zig from cache
         if: matrix.os != 'windows'

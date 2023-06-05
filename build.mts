@@ -302,8 +302,6 @@ async function buildNodeBinary(target?: string) {
     'build',
     '--target',
     pkg.rustTargetTriple,
-    '--target-dir',
-    pkg.rustTargetDir,
     '--output-dir',
     pkg.nativePackageDir,
     '--strip',
