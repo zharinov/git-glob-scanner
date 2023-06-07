@@ -1,9 +1,9 @@
 {
   "name": "{{ nativePackageName }}",
-  "version": "{{ rootPackageJson.version }}",
-  "description": "{{ rootPackageJson.description }}",
-  "repository": "{{ rootPackageJson.repository }}",
-  "license": "{{ rootPackageJson.license }}",
+  "version": "{{ packageVersion }}",
+  "description": "{{ packageDescription }}",
+  "repository": "{{ packageRepository }}",
+  "license": "{{ packageLicense }}",
   "os": [
     "{{ nodePlatform }}"
   ],

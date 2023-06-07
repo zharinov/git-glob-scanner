@@ -35,8 +35,11 @@ interface NativePackageContext {
   rustTargetDir: string;
   nodePlatform: NodePlatform;
   nodeArch: NodeArch;
-  rootPackageJson: RootPackageJson;
-  outputLinePrefix: string;
+  packageVersion: string;
+  packageDescription: string;
+  packageRepository: string;
+  packageLicense: string;
+  stdoutPrefix?: string;
 }
 
 let cachedNativePackages: NativePackageContext[] | undefined;
@@ -47,8 +50,14 @@ async function getNativePackages(): Promise<NativePackageContext[]> {
   }
 
   const rootPackageJson: RootPackageJson = await fs.readJson(upath.join(__dirname, 'package.json'));
+  const {
+    version: packageVersion,
+    description: packageDescription,
+    repository: packageRepository,
+    license: packageLicense,
+  } = rootPackageJson;
 
-  const packageContexts: Omit<NativePackageContext, 'outputLinePrefix'>[] = [];
+  const packageContexts: NativePackageContext[] = [];
   let maxSuffixLength = 0;
   for (const nodePlatform of nodePlatforms) {
     for (const nodeArch of nodeArchitectures) {
@@ -97,7 +106,10 @@ async function getNativePackages(): Promise<NativePackageContext[]> {
         rustTargetDir,
         nodePlatform,
         nodeArch,
-        rootPackageJson,
+        packageVersion,
+        packageDescription,
+        packageRepository,
+        packageLicense,
       });
 
       maxSuffixLength = Math.max(maxSuffixLength, nativePackageSuffix.length);
@@ -106,8 +118,7 @@ async function getNativePackages(): Promise<NativePackageContext[]> {
 
   return packageContexts.map((context) => ({
     ...context,
-    outputLinePrefix: `${context.nativePackageSuffix.padEnd(maxSuffixLength)} | `,
-    rootPackageJson,
+    stdoutPrefix: `${context.nativePackageSuffix.padEnd(maxSuffixLength)} | `,
   }));
 }
 
@@ -149,7 +160,7 @@ function stripReadyLines(data: Buffer, lineCallback: (line: string) => void, pre
   return lastLine;
 }
 
-async function exec(command: string, args: string[], outputPrefix: string = ''): Promise<void> {
+async function exec(command: string, args: string[], stdoutPrefix: string = ''): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       shell: true,
@@ -167,7 +178,7 @@ async function exec(command: string, args: string[], outputPrefix: string = ''):
       stdoutRest = stripReadyLines(
         data,
         (line) => {
-          console.log(`${outputPrefix}${line}`);
+          console.log(`${stdoutPrefix}${line}`);
         },
         stdoutRest,
       );
@@ -178,7 +189,7 @@ async function exec(command: string, args: string[], outputPrefix: string = ''):
       stderrRest = stripReadyLines(
         data,
         (line) => {
-          console.error(`${outputPrefix}${line}`);
+          console.error(`${stdoutPrefix}${line}`);
         },
         stderrRest,
       );
@@ -219,9 +230,7 @@ async function installRustTarget(target?: string): Promise<void> {
 
 async function installRustTargets(): Promise<void> {
   const packages = await getNativePackages();
-  const tasks = packages.map(
-    (pkg) => () => exec('rustup', ['target', 'add', pkg.rustTargetTriple], pkg.outputLinePrefix),
-  );
+  const tasks = packages.map((pkg) => () => exec('rustup', ['target', 'add', pkg.rustTargetTriple], pkg.stdoutPrefix));
   await pAll(tasks);
 }
 
@@ -283,7 +292,7 @@ async function buildNodeBinaries() {
         '--release',
         '--cross-compile',
       ],
-      pkg.outputLinePrefix,
+      pkg.stdoutPrefix,
     );
   };
 
