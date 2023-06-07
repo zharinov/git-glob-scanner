@@ -42,6 +42,30 @@ interface NativePackageContext {
   stdoutPrefix?: string;
 }
 
+async function getRootPackageJson(): Promise<RootPackageJson> {
+  const res: unknown = await fs.readJson(upath.join(__dirname, 'package.json'));
+  if (typeof res !== 'object' || res === null) {
+    throw new Error('Invalid package.json');
+  }
+  const { name, version, description, repository, license } = res as Record<string, unknown>;
+
+  const err = (field: string): Error => new Error(`Invalid package.json field: ${field}`);
+
+  if (typeof name !== 'string') {
+    throw err('name');
+  } else if (typeof version !== 'string') {
+    throw err('version');
+  } else if (typeof description !== 'string') {
+    throw err('description');
+  } else if (typeof repository !== 'string') {
+    throw err('repository');
+  } else if (typeof license !== 'string') {
+    throw err('license');
+  }
+
+  return { name, version, description, repository, license };
+}
+
 let cachedNativePackages: NativePackageContext[] | undefined;
 
 async function getNativePackages(): Promise<NativePackageContext[]> {
@@ -49,13 +73,12 @@ async function getNativePackages(): Promise<NativePackageContext[]> {
     return cachedNativePackages;
   }
 
-  const rootPackageJson: RootPackageJson = await fs.readJson(upath.join(__dirname, 'package.json'));
   const {
     version: packageVersion,
     description: packageDescription,
     repository: packageRepository,
     license: packageLicense,
-  } = rootPackageJson;
+  } = await getRootPackageJson();
 
   const packageContexts: NativePackageContext[] = [];
   let maxSuffixLength = 0;
