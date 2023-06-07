@@ -95,20 +95,20 @@ function nodePlatformToPackageOs(nodePlatform: string): PackageOs {
   return packageOs;
 }
 
-// function packageOsToNodePlatform(packageOs: string): NodePlatform {
-//   const key = packageOs.toLowerCase();
-//   const mapping: Record<string, NodePlatform> = {
-//     windows: 'win32',
-//     macos: 'darwin',
-//     linux: 'linux',
-//   };
+function packageOsToNodePlatform(packageOs: string): NodePlatform {
+  const key = packageOs.toLowerCase();
+  const mapping: Record<string, NodePlatform> = {
+    windows: 'win32',
+    macos: 'darwin',
+    linux: 'linux',
+  };
 
-//   const nodePlatform = mapping[key];
-//   if (!nodePlatform) {
-//     throw new Error(`Unknown package os: ${packageOs}`);
-//   }
-//   return nodePlatform;
-// }
+  const nodePlatform = mapping[key];
+  if (!nodePlatform) {
+    throw new Error(`Unknown package os: ${packageOs}`);
+  }
+  return nodePlatform;
+}
 
 function nodeArchToPackageArch(nodeArch: string): PackageArch {
   const key = nodeArch.toLowerCase();

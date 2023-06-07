@@ -7,12 +7,14 @@
     "noImplicitAny": true,
     "target": "es2022",
     "module": "es2022",
-    "noUnusedLocals": true,
     "noImplicitOverride": true,
     "useUnknownInCatchVariables": true,
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
     "declaration": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "swc": true
+  }
 }

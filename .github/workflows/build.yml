@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: test -d node_modules || yarn install --frozen-lockfile
 
+      - name: Type check
+        run: yarn -s lint:types
+
   setup-zig:
     runs-on: ubuntu-latest
     steps:
