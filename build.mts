@@ -18,6 +18,12 @@ const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
 type NodeArch = 'arm64' | 'x64' | 'ia32';
 const nodeArchitectures = ['arm64', 'x64'] as const;
 
+type PackageOs = 'windows' | 'macos' | 'linux';
+type PackageArch = 'arm64' | 'x64' | 'x86';
+
+type RustArch = 'i686' | 'x86_64' | 'aarch64';
+type RustOs = 'unknown-linux-gnu' | 'pc-windows-msvc' | 'apple-darwin';
+
 interface RootPackageJson {
   name: string;
   version: string;
@@ -66,6 +72,89 @@ async function getRootPackageJson(): Promise<RootPackageJson> {
   return { name, version, description, repository, license };
 }
 
+/**
+ * When using OS and architecture names, there is three different naming conventions:
+ * - "node": names used in node
+ * - "rust": names used in rust
+ * - "package": names used in this package and GitHub actions (meant to be human-readable)
+ *
+ * Following functions convert between these naming conventions.
+ */
+function nodePlatformToPackageOs(nodePlatform: string): PackageOs {
+  const key = nodePlatform.toLowerCase();
+  const mapping: Record<string, PackageOs> = {
+    win32: 'windows',
+    darwin: 'macos',
+    linux: 'linux',
+  };
+
+  const packageOs = mapping[key];
+  if (!packageOs) {
+    throw new Error(`Unknown node platform: ${nodePlatform}`);
+  }
+  return packageOs;
+}
+
+// function packageOsToNodePlatform(packageOs: string): NodePlatform {
+//   const key = packageOs.toLowerCase();
+//   const mapping: Record<string, NodePlatform> = {
+//     windows: 'win32',
+//     macos: 'darwin',
+//     linux: 'linux',
+//   };
+
+//   const nodePlatform = mapping[key];
+//   if (!nodePlatform) {
+//     throw new Error(`Unknown package os: ${packageOs}`);
+//   }
+//   return nodePlatform;
+// }
+
+function nodeArchToPackageArch(nodeArch: string): PackageArch {
+  const key = nodeArch.toLowerCase();
+  const mapping: Record<string, PackageArch> = {
+    ia32: 'x86',
+    x64: 'x64',
+    arm64: 'arm64',
+  };
+
+  const packageArch = mapping[key];
+  if (!packageArch) {
+    throw new Error(`Unknown node arch: ${nodeArch}`);
+  }
+  return packageArch;
+}
+
+function packageArchToRustArch(packageArch: string): RustArch {
+  const key = packageArch.toLowerCase();
+  const mapping: Record<string, RustArch> = {
+    ia32: 'i686',
+    x64: 'x86_64',
+    arm64: 'aarch64',
+  };
+
+  const rustArch = mapping[key];
+  if (!rustArch) {
+    throw new Error(`Unknown package arch: ${packageArch}`);
+  }
+  return rustArch;
+}
+
+function packageOsToRustOs(packageOs: string): RustOs {
+  const key = packageOs.toLowerCase();
+  const mapping: Record<string, RustOs> = {
+    windows: 'pc-windows-msvc',
+    macos: 'apple-darwin',
+    linux: 'unknown-linux-gnu',
+  };
+
+  const rustOs = mapping[key];
+  if (!rustOs) {
+    throw new Error(`Unknown package os: ${packageOs}`);
+  }
+  return rustOs;
+}
+
 let cachedNativePackages: NativePackageContext[] | undefined;
 
 async function getNativePackages(): Promise<NativePackageContext[]> {
@@ -86,17 +175,8 @@ async function getNativePackages(): Promise<NativePackageContext[]> {
     for (const nodeArch of nodeArchitectures) {
       const rootPackageName = packageOrg ? `${packageOrg}/${packageName}` : packageName;
 
-      const nativePackageOs = {
-        linux: 'linux',
-        win32: 'windows',
-        darwin: 'macos',
-      }[nodePlatform];
-
-      const nativePackageArch = {
-        ia32: 'x86',
-        x64: 'x64',
-        arm64: 'arm64',
-      }[nodeArch];
+      const nativePackageArch = nodeArchToPackageArch(nodeArch);
+      const nativePackageOs = nodePlatformToPackageOs(nodePlatform);
 
       const nativePackageSuffix = `${nativePackageOs}-${nativePackageArch}`;
       const nativePackageName = packageOrg
@@ -104,17 +184,8 @@ async function getNativePackages(): Promise<NativePackageContext[]> {
         : `${packageName}-${nativePackageSuffix}`;
       const nativePackageDir = upath.join(distDir, nativePackageSuffix);
 
-      const rustTargetArch = {
-        ia32: 'i686',
-        x64: 'x86_64',
-        arm64: 'aarch64',
-      }[nodeArch];
-
-      const rustTargetPlatform = {
-        linux: 'unknown-linux-gnu',
-        win32: 'pc-windows-msvc',
-        darwin: 'apple-darwin',
-      }[nodePlatform];
+      const rustTargetArch = packageArchToRustArch(nativePackageArch);
+      const rustTargetPlatform = packageOsToRustOs(nativePackageOs);
 
       const rustTargetTriple = `${rustTargetArch}-${rustTargetPlatform}`;
 
