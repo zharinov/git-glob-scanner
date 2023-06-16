@@ -214,3 +214,12 @@ jobs:
 
       - name: Build
         run: yarn -s build:build-node-binary "${{ matrix.os }}-${{ matrix.arch }}"
+
+  passing:
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    if: always()
+    steps:
+      - if: needs.build.result != 'success'
+        run: exit 1
