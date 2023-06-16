@@ -215,6 +215,12 @@ jobs:
       - name: Build
         run: yarn -s build:build-node-binary "${{ matrix.os }}-${{ matrix.arch }}"
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: native-modules
+          path: dist
+
   passing:
     needs: [build]
     runs-on: ubuntu-latest
