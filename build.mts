@@ -16,7 +16,7 @@ type NodePlatform = 'win32' | 'darwin' | 'linux';
 const nodePlatforms = ['win32', 'darwin', 'linux'] as const;
 
 type NodeArch = 'arm64' | 'x64' | 'ia32';
-const nodeArchitectures = ['arm64', 'x64', 'x86'] as const;
+const nodeArchitectures = ['arm64', 'x64', 'ia32'] as const;
 
 type PackageOs = 'windows' | 'macos' | 'linux';
 type PackageArch = 'arm64' | 'x64' | 'x86';
