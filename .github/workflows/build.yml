@@ -11,7 +11,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   ZIG_VERSION: 0.10.1
-  RUST_VERSION: 1.69.0
+  RUST_VERSION: 1.70.0
 
 jobs:
   setup-node:
@@ -214,3 +214,12 @@ jobs:
 
       - name: Build
         run: yarn -s build:build-node-binary "${{ matrix.os }}-${{ matrix.arch }}"
+
+  passing:
+    needs: [build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    if: always()
+    steps:
+      - if: needs.build.result != 'success'
+        run: exit 1
