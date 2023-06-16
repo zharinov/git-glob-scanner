@@ -116,15 +116,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      include:
-        - { os: 'linux', arch: 'x64' }
-        - { os: 'linux', arch: 'arm64' }
-        - { os: 'linux', arch: 'x86' }
-        - { os: 'windows', arch: 'x64' }
-        - { os: 'windows', arch: 'arm64' }
-        - { os: 'windows', arch: 'x86' }
-        - { os: 'macos', arch: 'x64' }
-        - { os: 'macos', arch: 'arm64' }
+      matrix:
+        include:
+          - { os: 'linux', arch: 'x64' }
+          - { os: 'linux', arch: 'arm64' }
+          - { os: 'linux', arch: 'x86' }
+          - { os: 'windows', arch: 'x64' }
+          - { os: 'windows', arch: 'arm64' }
+          - { os: 'windows', arch: 'x86' }
+          - { os: 'macos', arch: 'x64' }
+          - { os: 'macos', arch: 'arm64' }
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.5.3
