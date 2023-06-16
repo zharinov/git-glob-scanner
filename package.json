@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@napi-rs/cli": "3.0.0-alpha.4",
-    "@swc/core": "1.3.62",
+    "@swc/core": "1.3.64",
     "@taplo/cli": "0.5.2",
     "@types/fs-extra": "11.0.1",
     "@types/node": "20.2.5",
