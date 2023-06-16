@@ -128,7 +128,7 @@ function nodeArchToPackageArch(nodeArch: string): PackageArch {
 function packageArchToRustArch(packageArch: string): RustArch {
   const key = packageArch.toLowerCase();
   const mapping: Record<string, RustArch> = {
-    ia32: 'i686',
+    x86: 'i686',
     x64: 'x86_64',
     arm64: 'aarch64',
   };
