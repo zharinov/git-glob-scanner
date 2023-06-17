@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "lint:types": "tsc --noEmit",
-    "clean": "rimraf dist target",
+    "clean": "rimraf target dist/{linux,windows,macos}-{x86,x64,arm64}",
     "build": "ts-node-esm build.mts",
     "build:install-rust-targets": "ts-node-esm build.mts install-rust-targets",
     "build:install-rust-target": "ts-node-esm build.mts install-rust-target",
