@@ -411,6 +411,10 @@ async function buildNodeBinary(target?: string) {
     '--release',
     '--cross-compile',
   ]);
+
+  const from = upath.join(pkg.nativePackageDir, 'index.d.ts');
+  const to = upath.join(pkg.nativePackageDir, '..', 'index.d.ts');
+  await fs.move(from, to);
 }
 
 async function main() {
