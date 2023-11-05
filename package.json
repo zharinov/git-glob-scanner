@@ -27,7 +27,7 @@
     "benny": "3.7.1",
     "chalk": "5.3.0",
     "eslint": "8.43.0",
-    "eslint-config-prettier": "8.8.0",
+    "eslint-config-prettier": "9.0.0",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-prettier": "4.2.1",
     "fs-extra": "11.1.1",
