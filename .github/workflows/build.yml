@@ -158,7 +158,7 @@ jobs:
           echo "rust-toolchain=$(rustup show active-toolchain | awk '{print $1}')" >> "$GITHUB_OUTPUT"
 
       - name: Cache Rust
-        uses: Swatinem/rust-cache@v2.4.0
+        uses: Swatinem/rust-cache@v2.7.1
         with:
           key: ${{ matrix.os }}-${{ matrix.arch }}
           cache-all-crates: true
