@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 gix-config  = "0.31.0"
 globset     = "0.4.13"
 ignore      = "0.4.20"
-napi        = "2.13.3"
+napi        = "2.16.4"
 napi-derive = "2.13.0"
 
 [build-dependencies]
